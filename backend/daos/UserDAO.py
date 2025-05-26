@@ -39,6 +39,6 @@ class UserDAO:
 
     def get_available_by_role_and_cinema(self, role: UserRole, cinema_id: int) -> User:
         user = (
-            self.db.query(User).filter(User.role == role, User.ciname_id == cinema_id, User.available is True).first()
+            self.db.query(User).filter(User.role == role, User.cinema_id == cinema_id, User.available == True).first()
         )
         return user

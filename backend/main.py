@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers.user_router.users import router as user_router
 from routers.auth_router.auth import router as auth_router
 from routers.maintenance_router.maintenance import router as maintenance_router
+from routers.cinema_router.cinema import router as cinema_router
 
 app = FastAPI()
 app.add_middleware(
@@ -22,6 +23,7 @@ async def root():
 app.include_router(user_router)
 app.include_router(auth_router)
 app.include_router(maintenance_router)
+app.include_router(cinema_router)
 
 
 if __name__ == "__main__":

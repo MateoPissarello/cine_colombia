@@ -11,6 +11,12 @@ class UserRole(enum.Enum):
     maintenance_technician = "maintenance_technician"
 
 
+class MaintenanceState(enum.Enum):
+    created = "created"
+    assigned = "assigned"
+    completed = "completed"
+
+
 class days(enum.Enum):
     monday = "monday"
     tuesday = "tuesday"
@@ -42,7 +48,8 @@ class MaintenanceRequest(Base):
     issue = Column(String, nullable=False)
     complexity = Column(Integer, nullable=False)  # 1: básica, 2: media, 3: alta
     handled_by_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
-    solved = Column(Boolean, nullable=True)
+    state = Column(Enum(MaintenanceState, name="maintenance_state"), default=MaintenanceState.created)
+    solved = Column(Boolean, default=False)  # "yes" or "no"
     cinema_room = Column(Integer, ForeignKey("cinema_rooms.id"), nullable=True)
 
 
@@ -51,6 +58,7 @@ class CinemaRoom(Base):
     id = Column(Integer, primary_key=True, index=True)
     cinema_id = Column(Integer, ForeignKey("cinemas.id"), nullable=False)
     room_number = Column(Integer, nullable=False)
+    capacity = Column(Integer, nullable=False)
 
 
 class Cinema(Base):

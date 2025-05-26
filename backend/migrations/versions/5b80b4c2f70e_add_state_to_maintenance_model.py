@@ -1,8 +1,8 @@
-"""init models
+"""add state to maintenance model
 
-Revision ID: 6d5d1db1bf5a
+Revision ID: 5b80b4c2f70e
 Revises: 
-Create Date: 2025-05-25 22:59:22.577797
+Create Date: 2025-05-26 11:25:59.703645
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6d5d1db1bf5a'
+revision: str = '5b80b4c2f70e'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -58,6 +58,7 @@ def upgrade() -> None:
     sa.Column('issue', sa.String(), nullable=False),
     sa.Column('complexity', sa.Integer(), nullable=False),
     sa.Column('handled_by_id', sa.Integer(), nullable=True),
+    sa.Column('state', sa.Enum('created', 'assigned', 'completed', name='maintenance_state'), nullable=True),
     sa.Column('solved', sa.Boolean(), nullable=True),
     sa.Column('cinema_room', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['cinema_room'], ['cinema_rooms.id'], ),

@@ -47,7 +47,7 @@ async def admin_login(data: UserLogin = Body(...), db: Session = Depends(get_db)
                 status_code=response_status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid credentials",
             )
-    if user_data.role != "admin":
+    if user_data.role not in ["admin", "cinema_admin"]:
         raise HTTPException(
             status_code=response_status.HTTP_403_FORBIDDEN,
             detail="You are not authorized to access this resource",

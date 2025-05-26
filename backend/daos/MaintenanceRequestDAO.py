@@ -13,7 +13,7 @@ class MaintenaceRequestDAO:
         return request_data
 
     def update_maintenance_request(self, maintenance_request_id: int, updated_data: dict) -> MaintenanceRequest | None:
-        maintenance = self.get_schedule(maintenance_request_id)
+        maintenance = self.get_maintenance_request(maintenance_request_id)
         if maintenance:
             for key, value in updated_data.items():
                 setattr(maintenance, key, value)
