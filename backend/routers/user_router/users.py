@@ -7,6 +7,7 @@ from database import get_db
 from sqlalchemy.orm import Session
 from models import User
 from daos.UserDAO import UserDAO
+from daos.CinemaDAO import CinemaDAO
 from schemas.auth_schemas import TokenData
 from utils.RoleChecker import RoleChecker
 from utils.get_current_user import get_current_user
@@ -33,6 +34,13 @@ async def create_user(user: CreateUserBase = Body(...), db: Session = Depends(ge
         if db.query(User).filter(User.email == user_data.email).first():
             raise HTTPException(status_code=status_code.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
+        if user_data.cinema_id is not None:
+            cinema_dao = CinemaDAO(db)
+            cinema = cinema_dao.get_cinema(user_data.cinema_id)
+            if not cinema:
+                raise HTTPException(
+                    status_code=status_code.HTTP_404_NOT_FOUND, detail="Cinema with this ID does not exist"
+                )
         user_data = dao.create_user(user_data)
         return user_data
 
@@ -107,7 +115,6 @@ async def update_user(
         raise HTTPException(status_code=status_code.HTTP_404_NOT_FOUND, detail="User not found")
     if update_data.password:
         update_data.password = hash.get_password_hash(update_data.password)
-
     update_data_dict = update_data.model_dump(exclude_unset=True)
     updated_user = dao.update_user(current_user.user_id, update_data_dict)
     return updated_user

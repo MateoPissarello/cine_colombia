@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import User
+from models import User, UserRole
 
 
 class UserDAO:
@@ -36,3 +36,9 @@ class UserDAO:
             self.db.commit()
             return True
         return False
+
+    def get_available_by_role_and_cinema(self, role: UserRole, cinema_id: int) -> User:
+        user = (
+            self.db.query(User).filter(User.role == role, User.ciname_id == cinema_id, User.available is True).first()
+        )
+        return user

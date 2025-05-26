@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Literal
+from typing import Literal, Optional
 
 
 class UserLogin(BaseModel):
@@ -13,4 +13,5 @@ class TokenData(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
-    role: Literal["admin", "client"]
+    role: Literal["admin", "cinema_admin", "client", "maintenance_supervisor", "maintenance_technician"]
+    cinema_id: Optional[int] = None

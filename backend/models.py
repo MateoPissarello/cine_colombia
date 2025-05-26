@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey, Time, UniqueConstraint, Date
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean
 import enum
 from database import Base
 
@@ -6,6 +6,9 @@ from database import Base
 class UserRole(enum.Enum):
     client = "client"
     admin = "admin"
+    cinema_admin = "cinema_admin"
+    maintenance_supervisor = "maintenance_supervisor"
+    maintenance_technician = "maintenance_technician"
 
 
 class days(enum.Enum):
@@ -28,44 +31,33 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(Enum(UserRole, name="user_role"), default=UserRole.client)
+    cinema_id = Column(Integer, ForeignKey("cinemas.id"), nullable=True)
+    available = Column(Boolean, nullable=True)  # "yes" or "no"
 
 
-class Restaurant(Base):
-    __tablename__ = "restaurants"
-    restaurant_id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, nullable=False)
-    description = Column(String, nullable=False)
-    restaurant_type = Column(String, nullable=False)
-    phone_number = Column(String, nullable=False)
+class MaintenanceRequest(Base):
+    __tablename__ = "maintenance_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    issue = Column(String, nullable=False)
+    complexity = Column(Integer, nullable=False)  # 1: básica, 2: media, 3: alta
+    handled_by_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    solved = Column(Boolean, nullable=True)
+    cinema_room = Column(Integer, ForeignKey("cinema_rooms.id"), nullable=True)
+
+
+class CinemaRoom(Base):
+    __tablename__ = "cinema_rooms"
+    id = Column(Integer, primary_key=True, index=True)
+    cinema_id = Column(Integer, ForeignKey("cinemas.id"), nullable=False)
+    room_number = Column(Integer, nullable=False)
+
+
+class Cinema(Base):
+    __tablename__ = "cinemas"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
     address = Column(String, nullable=False)
-
-
-class Schedule(Base):
-    __tablename__ = "schedules"
-    schedule_id = Column(Integer, primary_key=True, index=True)
-    restaurant_id = Column(Integer, ForeignKey("restaurants.restaurant_id"), nullable=False)
-    day = Column(Enum(days, name="days_enum"), nullable=False)
-    opening_hour = Column(Time, nullable=False)
-    closing_hour = Column(Time, nullable=False)
-
-
-class Table(Base):
-    __tablename__ = "tables"
-    table_id = Column(Integer, primary_key=True, index=True)
-    restaurant_id = Column(Integer, ForeignKey("restaurants.restaurant_id"), nullable=False)
-    number = Column(Integer, nullable=False)
-    capacity = Column(Integer, nullable=False)
-    __table_args__ = (UniqueConstraint("restaurant_id", "number", name="unique_table_number"),)
-
-
-class Booking(Base):
-    __tablename__ = "bookings"
-    booking_id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    table_id = Column(Integer, ForeignKey("tables.table_id"), nullable=False)
-    restaurant_id = Column(Integer, ForeignKey("restaurants.restaurant_id"), nullable=False)
-    date = Column(Date, nullable=False)
-    start_time = Column(Time, nullable=False)
-    end_time = Column(Time, nullable=False)
-    number_of_people = Column(Integer, nullable=False)
-    __table_args__ = (UniqueConstraint("user_id", "table_id", "date", name="unique_booking"),)
+    phone = Column(String, nullable=False)
+    email = Column(String, nullable=False)
