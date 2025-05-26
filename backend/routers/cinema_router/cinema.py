@@ -12,7 +12,10 @@ from models import Cinema, CinemaRoom
 router = APIRouter(prefix="/cinema", tags=["Cinema"])
 
 employee_only = RoleChecker(allowed_roles=["admin", "cinema_admin", "maintenance_supervisor", "maintenance_technician"])
-all_users = RoleChecker(allowed_roles=["admin", "cinema_admin", "client", "maintenance_supervisor", "maintenance_technician"])
+all_users = RoleChecker(
+    allowed_roles=["admin", "cinema_admin", "client", "maintenance_supervisor", "maintenance_technician"]
+)
+
 
 @router.post("/", response_model=RetrieveCinema, status_code=status_code.HTTP_201_CREATED)
 async def create_cinema(

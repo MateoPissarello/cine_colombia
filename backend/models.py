@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, Time
 import enum
 from database import Base
 
@@ -69,3 +69,23 @@ class Cinema(Base):
     address = Column(String, nullable=False)
     phone = Column(String, nullable=False)
     email = Column(String, nullable=False)
+
+
+class Movie(Base):
+    __tablename__ = "movies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    genre = Column(String, nullable=False)
+    duration = Column(Integer, nullable=False)  # Duration in minutes
+    description = Column(String, nullable=True)
+
+
+class MovieShowtime(Base):
+    __tablename__ = "movie_showtimes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    movie_id = Column(Integer, ForeignKey("movies.id"), nullable=False)
+    cinema_room_id = Column(Integer, ForeignKey("cinema_rooms.id"), nullable=False)
+    showtime = Column(Time, nullable=False)  # Format: "HH:MM"
+    day_of_week = Column(Enum(days, name="days_of_week"), nullable=False)  # Enum for days of the week
