@@ -14,6 +14,13 @@ class MovieDAO:
         self.db.refresh(request_data)
         return request_data
 
+    def delete_all_showtimes_for_cinema(self, cinema_id: int) -> None:
+        """
+        Elimina todos los horarios de películas para un cine específico.
+        """
+        self.db.query(MovieShowtime).filter(MovieShowtime.cinema_room_id == cinema_id).delete()
+        self.db.commit()
+
     def is_showtime_available(self, cinema_room_id: int, day_of_week: str, new_start: time, new_duration: int) -> bool:
         new_start_dt = datetime.combine(datetime.today(), new_start)
         new_end_dt = new_start_dt + timedelta(minutes=new_duration)

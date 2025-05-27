@@ -4,7 +4,9 @@ from daos.MovieDAO import MovieDAO
 from daos.CinemaDAO import CinemaDAO
 from models import Movie, MovieShowtime
 from typing import List
-
+from service.memento.originator import ShowtimeOriginator
+from service.memento.caretaker import SnapshotCaretaker
+from daos.ShowtimeSnapshotDAO import ShowtimeSnapshotDAO
 from utils.iterators.movie_showtime_iterator import MovieShowtimeCollection
 
 
@@ -14,6 +16,43 @@ class MovieService:
         self.request_dao = MaintenaceRequestDAO(db)
         self.movie_dao = MovieDAO(db)
         self.cinema_dao = CinemaDAO(db)
+
+    def save_programming_snapshot(self, cinema_id: int) -> None:
+        """
+        Save a snapshot of the current movie programming for a specific cinema.
+        """
+        try:
+            cinema = self.cinema_dao.get_cinema(cinema_id)
+            if not cinema:
+                raise ValueError("Cinema not found")
+            snapshot_dao = ShowtimeSnapshotDAO(self.db)
+            originator = ShowtimeOriginator(self.movie_dao)
+            caretaker = SnapshotCaretaker(snapshot_dao)
+
+            memento = originator.create_memento(cinema_id)
+            caretaker.store_snapshot(cinema_id, memento)
+        except Exception as e:
+            raise ValueError(f"Error saving programming snapshot: {str(e)}")
+
+    def restore_last_snapshot(self, cinema_id: int) -> None:
+        """
+        Restore the last snapshot of movie programming for a specific cinema.
+        """
+        try:
+            cinema = self.cinema_dao.get_cinema(cinema_id)
+            if not cinema:
+                raise ValueError("Cinema not found")
+            snapshot_dao = ShowtimeSnapshotDAO(self.db)
+            originator = ShowtimeOriginator(self.movie_dao)
+            caretaker = SnapshotCaretaker(snapshot_dao)
+
+            memento = caretaker.retrieve_latest_snapshot(cinema_id)
+            if not memento:
+                raise ValueError("No snapshots found for this cinema")
+
+            originator.restore_from_memento(cinema_id, memento)
+        except Exception as e:
+            raise ValueError(f"Error restoring snapshot: {str(e)}")
 
     def create_movie(self, movie_data: Movie) -> Movie:
         """

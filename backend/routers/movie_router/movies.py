@@ -20,6 +20,43 @@ all_users = RoleChecker(
 )
 
 
+@router.post("/cinemas/{cinema_id}/save-snapshot", status_code=response_status.HTTP_201_CREATED)
+async def save_programming_snapshot(
+    cinema_id: int,
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
+    role_checker: RoleChecker = Depends(only_admins),
+):
+    """
+    Save a snapshot of the current movie programming for a specific cinema.
+    """
+    service = MovieService(db)
+    try:
+        service.save_programming_snapshot(cinema_id)
+        return {"message": "Programming snapshot saved successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=response_status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.post("/cinemas/{cinema_id}/restore-snapshot", status_code=response_status.HTTP_200_OK)
+async def restore_last_snapshot(
+    cinema_id: int,
+    db: Session = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
+    role_checker: RoleChecker = Depends(only_admins),
+):
+    """
+    Restore the last snapshot of movie programming for a specific cinema.
+    """
+
+    service = MovieService(db)
+    try:
+        service.restore_last_snapshot(cinema_id)
+        return {"message": "Programming snapshot restored successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=response_status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
 @router.get("/", response_model=List[MovieRetrieve], status_code=response_status.HTTP_200_OK)
 async def get_all_movies(
     db: Session = Depends(get_db),

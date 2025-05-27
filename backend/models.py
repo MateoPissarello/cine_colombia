@@ -1,4 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, Time
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Boolean, Time, JSON, DateTime
+from datetime import datetime
 import enum
 from database import Base
 
@@ -89,3 +90,12 @@ class MovieShowtime(Base):
     cinema_room_id = Column(Integer, ForeignKey("cinema_rooms.id"), nullable=False)
     showtime = Column(Time, nullable=False)  # Format: "HH:MM"
     day_of_week = Column(Enum(days, name="days_of_week"), nullable=False)  # Enum for days of the week
+
+
+class ShowtimeSnapshot(Base):
+    __tablename__ = "showtime_snapshots"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cinema_id = Column(Integer, ForeignKey("cinemas.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.now(), nullable=False)  # Timestamp of the snapshot creation
+    data = Column(JSON, nullable=False)  # JSON field to store the snapshot data
