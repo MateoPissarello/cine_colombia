@@ -99,3 +99,18 @@ class ShowtimeSnapshot(Base):
     cinema_id = Column(Integer, ForeignKey("cinemas.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.now(), nullable=False)  # Timestamp of the snapshot creation
     data = Column(JSON, nullable=False)  # JSON field to store the snapshot data
+
+
+class TicketSale(Base):
+    __tablename__ = "ticket_sales"
+
+    id = Column(Integer, primary_key=True, index=True)
+    showtime_id = Column(Integer, ForeignKey("movie_showtimes.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+
+    buyer_name = Column(String, nullable=True)
+    buyer_email = Column(String, nullable=True)
+    buyer_phone = Column(String, nullable=True)
+
+    tickets_sold = Column(Integer, nullable=False)
+    purchase_time = Column(DateTime, default=datetime.now(), nullable=False)  # Timestamp of the purchase

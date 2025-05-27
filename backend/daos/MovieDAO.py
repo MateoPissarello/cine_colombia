@@ -14,6 +14,10 @@ class MovieDAO:
         self.db.refresh(request_data)
         return request_data
 
+    def get_showtime_by_id(self, showtime_id: int) -> MovieShowtime | None:
+        showtime = self.db.query(MovieShowtime).filter(MovieShowtime.id == showtime_id).first()
+        return showtime
+
     def delete_all_showtimes_for_cinema(self, cinema_id: int) -> None:
         """
         Elimina todos los horarios de películas para un cine específico.
@@ -74,11 +78,10 @@ class MovieDAO:
         )
         return showtimes
 
-
-def delete_showtime(self, showtime_id: int) -> bool:
-    showtime = self.db.query(MovieShowtime).filter(MovieShowtime.id == showtime_id).first()
-    if showtime:
-        self.db.delete(showtime)
-        self.db.commit()
-        return True
-    return False
+    def delete_showtime(self, showtime_id: int) -> bool:
+        showtime = self.db.query(MovieShowtime).filter(MovieShowtime.id == showtime_id).first()
+        if showtime:
+            self.db.delete(showtime)
+            self.db.commit()
+            return True
+        return False
